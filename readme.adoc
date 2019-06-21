@@ -1,0 +1,38 @@
+= tmpfox
+
+Script for creating temporary Firefox instances.
+
+Copy the script in your `PATH`, and execute `tmpfox` or `tmpfox URL`.
+
+This scripts starts an instance of Firefox in a completely new profile.
+
+This new `Firefox` instance does does not share any settings with the other instances, and all files will get deleted when closing the browser.
+
+== Advantages over private mode and containers
+
+a) Privacy
+
+Private mode and containers still share the same plugins and browser settings.
+This increases traceability (for example the user agent is unchanged), and makes it difficult to test other settings.
+
+b) Small profile
+
+Creating temporary profiles also has the advantage to keep your profile small and clean.
+Cookies and other temporary accumulates with time.
+Containers are not usable in private mode, with temporary profiles there are no such limitations.
+
+c) Different configurations
+
+It also permits to test quickly websites with default settings (or different settings in general), if you suspect for example that blocking cookies, JavaScript of other technologies is limiting the functionality.
+
+== tmpfox settings
+
+If set, `tmpfox` will honor the home page defined at `WWW_HOME`.
+Reusable settings can be saved under `"${XDG_CONFIG_HOME:-$HOME/.config}/tmpfox/user_pref"`.
+
+Most settings are described at https://ffprofile.com/[ffprofile] and http://kb.mozillazine.org[mozillazine].
+
+Otherwise `tmpfox` uses the default `Firefox` settings, with a couple of differences.
+
+Introductions and preliminary checks, for example testing if Firefox is the default browser or not, are disabled by default.
+If you want to start `tmpfox` with all `Firefox` default settings, use `--no-default-settings`.
