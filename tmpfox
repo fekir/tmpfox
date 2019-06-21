@@ -1,0 +1,107 @@
+#!/bin/sh
+
+set -o errexit
+set -o nounset
+
+TMPDIR=${XDG_RUNTIME_DIR:-${TMPDIR:-${TMP:-${TEMP:-/tmp}}}}
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/tmpfox"
+
+# FIXME: check path, and or default values
+get_browser_settings(){
+  SETTINGS="$1";
+  #grep --invert-match -e '#' "$SETTINGS";
+  cat "$SETTINGS";
+}
+
+get_default_settings(){
+  # default settings should leave the browser in a state when someone can use it immediately
+  # - do not open multiple tabs
+  # - avoid welcome screens
+  # - avoid tutorials
+  # check https://ffprofile.com/
+  printf 'user_pref("browser.shell.checkDefaultBrowser", false);\n'
+  #printf 'user_pref("extensions.autoDisableScopes", 14);\n' # do not open page of newly installed plugins, but also disables them...
+  printf 'user_pref("toolkit.telemetry.reportingpolicy.firstRun", false);\n' # privacy notice
+
+  # do not install other things in tmpfox, eases reproducibility
+  printf 'user_pref("experiments.activeExperiment", false);\n'
+  printf 'user_pref("experiments.enabled", false);\n'
+  printf 'user_pref("experiments.manifest.uri", "");\n'
+  printf 'user_pref("experiments.supported", false);\n'
+  printf 'user_pref("network.allow-experiments", false);\n'
+  printf 'user_pref("app.shield.optoutstudies.enabled", false);\n'
+
+  # respect $WWW_HOME, but only if present
+  if [ -n "${WWW_HOME+x}" ]; then
+    printf 'user_pref("browser.startup.homepage", "%s");\n' "$WWW_HOME"
+    printf 'user_pref("startup.homepage_welcome_url", "%s");\n' "$WWW_HOME"
+  fi
+}
+
+is_help_param(){
+  [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "h" ] || [ "$1" = "help" ] || [ "$1" = "?" ];
+}
+
+help(){
+  firefox --version | sed -e '1s;^;tmpfox, based on ;';
+  printf '\ntmpfox options\n'
+  printf 'Usage: tmpfox [ options ... ] [URL]\n'
+  printf '     where options include:\n'
+  printf '  -h or --help       Print this message.\n'
+  firefox --help | grep --invert-match -e '^Usage' -e ' *where options '\
+                  -e '--help' -e '--version' -e '--profile' -e '--ProfileManager';
+                  # there are possibly other parameters to hide
+}
+
+version(){
+  printf '%s version %s\nbased on: ' "${0##*/}" 0.1
+  firefox --version;
+}
+
+main(){
+  PROFILEDIR="$(mktemp -p "$TMPDIR" -d ff.XXXXXX.d)";
+  trap 'rm -r -- "$PROFILEDIR"' INT QUIT EXIT;
+
+  SETTINGS="$CONFIG_DIR/user_pref";
+  DEFAULT_SETTINGS=true;
+
+  PARSE=true;
+  NEXT_IS_SETTINGS_FILE=false;
+
+  for key in "$@"; do :;
+    shift
+    if ! $PARSE; then :;
+      set -- "$@" "$key";
+    else
+      if   $NEXT_IS_SETTINGS_FILE; then :;
+        SETTINGS="$key"; NEXT_IS_SETTINGS_FILE=false;
+      elif [ "$key" = "--settings-files" ]; then :;
+        NEXT_IS_SETTINGS_FILE=true;
+      elif [ "$key" = "--no-default-settings" ]; then :;
+        DEFAULT_SETTINGS=false;
+      elif is_help_param "$key"; then :;
+        help;
+        exit 0;
+      elif [ "$key" = "-v" ] || [ "$key" = "--version" ]; then :;
+        version;
+        exit 0;
+      else
+        set -- "$@" "$key";
+      fi
+      if [ "$key" = "--" ]; then :;
+        PARSE=false;
+      fi
+    fi
+  done
+
+  if $DEFAULT_SETTINGS; then :;
+    get_default_settings > "$PROFILEDIR/prefs.js";
+  fi
+  if [ -f "$SETTINGS" ]; then
+    get_browser_settings "$SETTINGS" >> "$PROFILEDIR/prefs.js";
+  fi
+
+  XDG_CACHE_HOME="$PROFILEDIR/cache" firefox -profile "$PROFILEDIR" -no-remote -new-instance "$@";
+}
+
+main "$@"
