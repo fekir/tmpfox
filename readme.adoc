@@ -36,3 +36,5 @@ Otherwise `tmpfox` uses the default `Firefox` settings, with a couple of differe
 
 Introductions and preliminary checks, for example testing if Firefox is the default browser or not, are disabled by default.
 If you want to start `tmpfox` with all `Firefox` default settings, use `--no-default-settings`.
+
+As a possible example look at `user_pref.sample`.
