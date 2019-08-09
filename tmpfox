@@ -53,6 +53,20 @@ get_default_settings(){
   fi
 }
 
+copy_extension(){
+  min_num_files=0
+  if [ -d "$1" ]; then :;
+    min_num_files="$(find "$1" -name "*" -type d -printf . -quit | wc -c)";
+  fi
+  if [ "$min_num_files" -gt 0 ]; then :;
+    mkdir "$PROFILEDIR/extensions/";
+    for file in "$1"/*; do
+      newname="$(zipgrep 'id' "$file" | grep manifest.json | tr -s ' ' | cut -d ' ' -f3 | cut -d '"' -f2)";
+      cp "$file" "$2/$newname.xpi";
+    done
+  fi
+}
+
 is_help_param(){
   [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "h" ] || [ "$1" = "help" ] || [ "$1" = "?" ];
 }
@@ -115,6 +129,8 @@ main(){
   if [ -f "$SETTINGS" ]; then
     get_browser_settings "$SETTINGS" >> "$PROFILEDIR/prefs.js";
   fi
+
+  copy_extension "$CONFIG_DIR/extensions/" "$PROFILEDIR/extensions/"
 
   XDG_CACHE_HOME="$PROFILEDIR/cache" firefox -profile "$PROFILEDIR" -no-remote -new-instance "$@";
 }

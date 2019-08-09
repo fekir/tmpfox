@@ -21,7 +21,7 @@ user_pref("browser.ctrlTab.recentlyUsedOrder", false);
 // https://support.mozilla.org/en-US/questions/1199017
 user_pref("browser.link.open_newwindow", 1);
 user_pref("browser.link.open_newwindow.restriction", 0);
-user_pref("browser.link.open_newwindow.override.external", 3)
+user_pref("browser.link.open_newwindow.override.external", 3);
 
 // do not hide url in fullscreen mode
 user_pref("browser.fullscreen.autohide", false);
@@ -76,3 +76,8 @@ user_pref("signon.autofillForms", false);
 user_pref("webgl.disabled", true);
 user_pref("webgl.renderer-string-override", " ");
 user_pref("webgl.vendor-string-override", " ");
+
+# automatically install addons, but only from this profile
+# https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Distribution_options/Add-ons_in_the_enterprise
+user_pref("extensions.autoDisableScopes", 0);
+user_pref("extensions.enabledScopes",  1);
