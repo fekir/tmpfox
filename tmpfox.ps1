@@ -31,6 +31,11 @@ function get_default_settings{
   # 'user_pref("extensions.autoDisableScopes", 14);' # do not open page of newly installed plugins, but also disables them...
   'user_pref("toolkit.telemetry.reportingpolicy.firstRun", false);' # privacy notice
 
+  # otherwise asks if OK to close all tabs/windows
+  'user_pref("browser.sessionstore.warnOnQuit", false);'
+  'user_pref("browser.warnOnRestart", false);'
+  'user_pref("browser.tabs.warnOnClose", false);'
+
   # do not install other things in tmpfox, eases reproducibility
   'user_pref("experiments.activeExperiment", false);'
   'user_pref("experiments.enabled", false);'

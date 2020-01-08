@@ -38,6 +38,11 @@ get_default_settings(){
   #printf 'user_pref("extensions.autoDisableScopes", 14);\n' # do not open page of newly installed plugins, but also disables them...
   printf 'user_pref("toolkit.telemetry.reportingpolicy.firstRun", false);\n' # privacy notice
 
+  # otherwise asks if OK to close all tabs/windows
+  printf 'user_pref("browser.sessionstore.warnOnQuit", false);\n'
+  printf 'user_pref("browser.warnOnRestart", false);\n'
+  printf 'user_pref("browser.tabs.warnOnClose", false);\n'
+
   # do not install other things in tmpfox, eases reproducibility
   printf 'user_pref("experiments.activeExperiment", false);\n'
   printf 'user_pref("experiments.enabled", false);\n'
