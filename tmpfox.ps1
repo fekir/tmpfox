@@ -47,13 +47,20 @@ function get_default_settings{
 
 function main {
   [string] $PROFILEDIR = New-TemporaryDirectory;
-  Set-Content -Path "$PROFILEDIR/prefs.js" -Value (get_default_settings)
-  $PROFILEDIR_SETTINGS = $PROFILEDIR.replace('\','\\');
-  Add-Content -Path "$PROFILEDIR/prefs.js" -Value "user_pref(`"browser.cache.disk.parent_directory`", `"$PROFILEDIR_SETTINGS`");"
 
-  # Start-Process might be better, but ArgumentList has issues with spaces
-  & 'C:\Program Files\Mozilla Firefox\firefox.exe' "-profile" "$PROFILEDIR" "-no-remote" "-new-instance" $args  | Wait-Process;
-  Remove-Item -Path "$PROFILEDIR" -Recurse -ErrorAction SilentlyContinue
+  try {
+    Set-Content -Path "$PROFILEDIR/prefs.js" -Value (get_default_settings)
+    $PROFILEDIR_SETTINGS = $PROFILEDIR.replace('\','\\');
+    Add-Content -Path "$PROFILEDIR/prefs.js" -Value "user_pref(`"browser.cache.disk.parent_directory`", `"$PROFILEDIR_SETTINGS`");"
+
+    $ffargs=@("-profile","`"$PROFILEDIR`"","--no-remote","--new-instance")
+    foreach ($arg in $args) {
+      $ffargs += $arg
+    }
+    Start-Process -Wait -FilePath 'C:\Program Files\Mozilla Firefox\firefox.exe' -WorkingDirectory $env:Temp -ArgumentList $ffargs
+  } finally {
+    Remove-Item -Path "$PROFILEDIR" -Recurse -ErrorAction SilentlyContinue
+  }
 }
 
 main $args
