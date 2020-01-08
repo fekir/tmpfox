@@ -61,11 +61,11 @@ get_default_settings() {
 copy_extension() {
   min_num_files=0
   if [ -d "$1" ]; then :;
-    min_num_files="$(find "$1" -name "*" -type d -printf . -quit | wc -c)";
+    min_num_files="$(find "$1" -name "*xpi" -type f -printf . -quit | wc -c)";
   fi
   if [ "$min_num_files" -gt 0 ]; then :;
-    mkdir "$2/";
-    for file in "$1"/*; do
+    mkdir "$PROFILEDIR/extensions/";
+    for file in "$1"/*xpi; do
       newname="$(zipgrep 'id' "$file" | grep manifest.json | tr -s ' ' | cut -d ' ' -f3 | cut -d '"' -f2)";
       cp "$file" "$2/$newname.xpi";
     done
