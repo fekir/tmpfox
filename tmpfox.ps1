@@ -82,12 +82,15 @@ function is_help_param([string] $1) {
 function help() {
   'tmpfox options'
   'Usage: tmpfox [ options ... ] [URL]'
+   & 'C:\Program Files\Mozilla Firefox\firefox.exe' --help |
+     Select-String -NotMatch -Pattern \
+                  @('^Usage', '--help', '--version', '--profile', '--ProfileManager', '--migration');
+                  # there are possibly other parameters to hide
 }
 
 function version() {
-  'tmpfox version 0.1'
-  'based on: '
-  (& 'C:\Program Files\Mozilla Firefox\firefox.exe' --version | more)[0]
+  'tmpfox version {0}' -f 0.1
+  'based on: {0}' -f (& 'C:\Program Files\Mozilla Firefox\firefox.exe' --version | more)[0]
 }
 
 # FIXME: make to function that takes all arguments

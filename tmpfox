@@ -83,7 +83,7 @@ help(){
   printf '     where options include:\n'
   printf '  -h or --help       Print this message.\n'
   firefox --help | grep --invert-match -e '^Usage' -e ' *where options '\
-                  -e '--help' -e '--version' -e '--profile' -e '--ProfileManager';
+                  -e '--help' -e '--version' -e '--profile' -e '--ProfileManager' -e '--migration';
                   # there are possibly other parameters to hide
 }
 
