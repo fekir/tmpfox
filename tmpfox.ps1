@@ -29,7 +29,10 @@ function get_config_dir() {
   if ($env:LOCALAPPDATA) {
     return "$env:LOCALAPPDATA/tmpfox";
   }
-  return "$env:HOME/.config/tmpfox";
+  if ($HOME) {
+    return "$HOME/.config/tmpfox"
+  }
+  return "$env:USERPROFILE/.config/tmpfox";
 }
 
 function get_browser_settings([string] $SETTINGS) {
