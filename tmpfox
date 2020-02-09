@@ -66,7 +66,7 @@ copy_extension() {
   if [ "$min_num_files" -gt 0 ]; then :;
     mkdir "$PROFILEDIR/extensions/";
     for file in "$1"/*xpi; do
-      newname="$(zipgrep 'id' "$file" | grep manifest.json | tr -s ' ' | cut -d ' ' -f3 | cut -d '"' -f2)";
+      newname="$(zipgrep '"id"' "$file" | grep manifest.json | tr -s ' ' | cut -d ' ' -f3 | cut -d '"' -f2)";
       cp "$file" "$2/$newname.xpi";
     done
   fi
